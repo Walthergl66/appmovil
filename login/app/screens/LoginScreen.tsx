@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Alert,
+  Modal,
   StyleSheet,
   Text,
   TextInput,
@@ -11,26 +11,48 @@ import {
 import { colors } from '../theme/colors';
 import type { AuthData } from '../types/auth';
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 type LoginScreenProps = {
   onLoginSuccess: (email: string) => void;
 };
 
 export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   const [form, setForm] = useState<AuthData>({ email: '', password: '' });
-
-  const isFormValid =
-    form.email.trim().length > 0 && form.password.trim().length >= 6;
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
   const handleChange = (field: keyof AuthData, value: string): void => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  const closeAlert = (): void => {
+    setAlertMessage(null);
+  };
+
+  const getValidationError = (): string | null => {
+    const email = form.email.trim();
+    const password = form.password.trim();
+
+    if (email.length === 0) {
+      return 'Ingresa tu correo.';
+    }
+
+    if (!EMAIL_REGEX.test(email)) {
+      return 'Ingresa un correo valido.';
+    }
+
+    if (password.length < 6) {
+      return 'La contrasena debe tener al menos 6 caracteres.';
+    }
+
+    return null;
+  };
+
   const handleLogin = (): void => {
-    if (!isFormValid) {
-      Alert.alert(
-        'Datos incompletos',
-        'Ingresa un correo y una contrasena de al menos 6 caracteres.'
-      );
+    const validationError = getValidationError();
+
+    if (validationError) {
+      setAlertMessage(validationError);
       return;
     }
 
@@ -63,14 +85,28 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
           onChangeText={(text: string) => handleChange('password', text)}
         />
 
-        <TouchableOpacity
-          style={[styles.button, !isFormValid && styles.buttonDisabled]}
-          onPress={handleLogin}
-          disabled={!isFormValid}
-        >
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Ingresar</Text>
         </TouchableOpacity>
       </View>
+
+      <Modal
+        transparent
+        animationType="fade"
+        visible={alertMessage !== null}
+        onRequestClose={closeAlert}
+      >
+        <View style={styles.alertOverlay}>
+          <View style={styles.alertCard}>
+            <Text style={styles.alertTitle}>Datos invalidos</Text>
+            <Text style={styles.alertMessage}>{alertMessage ?? ''}</Text>
+
+            <TouchableOpacity style={styles.alertButton} onPress={closeAlert}>
+              <Text style={styles.alertButtonText}>Entendido</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -119,12 +155,47 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 4,
   },
-  buttonDisabled: {
-    opacity: 0.55,
-  },
   buttonText: {
     color: '#ffffff',
     fontSize: 17,
+    fontWeight: '600',
+  },
+  alertOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(45, 58, 44, 0.35)',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  alertCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 18,
+  },
+  alertTitle: {
+    color: colors.primaryDark,
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  alertMessage: {
+    color: colors.textPrimary,
+    fontSize: 15,
+    lineHeight: 22,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  alertButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  alertButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
     fontWeight: '600',
   },
 });
