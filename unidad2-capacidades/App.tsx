@@ -21,6 +21,17 @@ type Producto = {
   creadoEn: number;
 };
 
+const COLORS = {
+  bg: '#F3FBF4',
+  surface: '#FFFFFF',
+  text: '#0F1A12',
+  muted: '#5B6B60',
+  border: '#DDEBE0',
+  brand: '#63B547',
+  brandDark: '#2F8A2E',
+  danger: '#D64545',
+};
+
 export default function App() {
   const [imagen, setImagen] = useState<string | null>(null);
   const [nombre, setNombre] = useState('');
@@ -128,20 +139,27 @@ export default function App() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Image
-        source={require('./assets/nexologo.jpeg')}
-        style={styles.logo}
-        accessibilityLabel="Logo Nexologo"
-      />
-
-      <Text style={styles.titulo}>NexoCatálogo</Text>
-
-      <Text style={styles.subtitulo}>
-        Emprendimiento sencillo: registra productos con foto desde la cámara
-      </Text>
+      <View style={styles.header}>
+        <View style={styles.logoWrap}>
+          <Image
+            source={require('./assets/nexologo.jpeg')}
+            style={styles.logo}
+            accessibilityLabel="Logo Nexologo"
+          />
+        </View>
+        <Text style={styles.titulo}>NexoCatálogo</Text>
+        <Text style={styles.subtitulo}>
+          Registra productos con foto y guárdalos en tu catálogo
+        </Text>
+      </View>
 
       <View style={styles.card}>
-        <Text style={styles.label}>Foto del producto:</Text>
+        <View style={styles.seccionTitulo}>
+          <Text style={styles.cardTitulo}>Nuevo producto</Text>
+          <Text style={styles.cardAyuda}>Toma una foto y completa los datos.</Text>
+        </View>
+
+        <Text style={styles.label}>Foto</Text>
 
         {imagen ? (
           <Image source={{ uri: imagen }} style={styles.imagen} />
@@ -151,47 +169,55 @@ export default function App() {
           </View>
         )}
 
-        <TouchableOpacity style={styles.botonCamara} onPress={tomarFoto}>
-          <Text style={styles.textoBoton}>Tomar foto</Text>
-        </TouchableOpacity>
+        <View style={styles.row}>
+          <TouchableOpacity style={[styles.boton, styles.botonPrimario]} onPress={tomarFoto}>
+            <Text style={styles.textoBoton}>Tomar foto</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.botonGaleria} onPress={seleccionarImagen}>
-          <Text style={styles.textoBoton}>Elegir de galería</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.boton, styles.botonSecundario]}
+            onPress={seleccionarImagen}
+          >
+            <Text style={styles.textoBotonSecundario}>Galería</Text>
+          </TouchableOpacity>
+        </View>
 
-        <Text style={styles.label}>Nombre:</Text>
+        <Text style={styles.label}>Nombre</Text>
 
         <TextInput
           style={styles.input}
           placeholder="Ej: Taza personalizada"
           value={nombre}
           onChangeText={setNombre}
+          placeholderTextColor={COLORS.muted}
         />
 
-        <Text style={styles.label}>Precio:</Text>
+        <Text style={styles.label}>Precio</Text>
         <TextInput
           style={styles.input}
           placeholder="Ej: 25.000"
           value={precio}
           onChangeText={setPrecio}
           keyboardType="numeric"
+          placeholderTextColor={COLORS.muted}
         />
 
-        <Text style={styles.label}>Descripción:</Text>
+        <Text style={styles.label}>Descripción</Text>
         <TextInput
           style={styles.inputMultiline}
           placeholder="Detalles, materiales, talla, etc."
           value={descripcion}
           onChangeText={setDescripcion}
           multiline
+          placeholderTextColor={COLORS.muted}
         />
 
-        <TouchableOpacity style={styles.botonGuardar} onPress={guardarProducto}>
+        <TouchableOpacity style={[styles.boton, styles.botonGuardar]} onPress={guardarProducto}>
           <Text style={styles.textoBoton}>Guardar producto</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.botonLimpiar} onPress={limpiarFormulario}>
-          <Text style={styles.textoBoton}>Limpiar formulario</Text>
+        <TouchableOpacity style={[styles.boton, styles.botonLimpiar]} onPress={limpiarFormulario}>
+          <Text style={styles.textoBotonLimpiar}>Limpiar formulario</Text>
         </TouchableOpacity>
       </View>
 
@@ -199,7 +225,12 @@ export default function App() {
         <Text style={styles.tituloLista}>Catálogo ({productos.length})</Text>
 
         {productos.length === 0 ? (
-          <Text style={styles.textoListaVacia}>Aún no has agregado productos.</Text>
+          <View style={styles.vacio}>
+            <Text style={styles.textoListaVacia}>Aún no has agregado productos.</Text>
+            <Text style={styles.textoListaVaciaAyuda}>
+              Empieza creando tu primer producto arriba.
+            </Text>
+          </View>
         ) : (
           productos.map((p) => (
             <View key={p.id} style={styles.item}>
@@ -224,49 +255,84 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#eef3f8',
-    padding: 20,
+    backgroundColor: COLORS.bg,
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 28,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 14,
+    paddingVertical: 12,
+  },
+  logoWrap: {
+    width: 96,
+    height: 96,
+    borderRadius: 28,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 2,
   },
   logo: {
-    width: 92,
-    height: 92,
-    borderRadius: 46,
-    alignSelf: 'center',
-    marginBottom: 12,
+    width: 82,
+    height: 82,
+    borderRadius: 20,
   },
   titulo: {
     fontSize: 28,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: '#123456',
-    marginBottom: 8,
+    color: COLORS.text,
+    marginBottom: 6,
+    letterSpacing: 0.2,
   },
   subtitulo: {
     fontSize: 15,
     textAlign: 'center',
-    color: '#555',
-    marginBottom: 20,
+    color: COLORS.muted,
+    marginBottom: 4,
   },
   card: {
-    backgroundColor: '#fff',
-    padding: 20,
+    backgroundColor: COLORS.surface,
+    padding: 18,
     borderRadius: 18,
     elevation: 5,
     shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  seccionTitulo: {
+    marginBottom: 12,
+  },
+  cardTitulo: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.text,
+  },
+  cardAyuda: {
+    marginTop: 4,
+    fontSize: 13,
+    color: COLORS.muted,
   },
   label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: 13,
+    fontWeight: '700',
+    color: COLORS.muted,
     marginBottom: 8,
-    marginTop: 10,
+    marginTop: 12,
+    letterSpacing: 0.2,
+    textTransform: 'uppercase',
   },
   imagen: {
     width: '100%',
@@ -280,43 +346,52 @@ const styles = StyleSheet.create({
     height: 220,
     borderRadius: 15,
     borderWidth: 2,
-    borderColor: '#ccc',
+    borderColor: COLORS.border,
     borderStyle: 'dashed',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#F7FBF8',
   },
   textoVacio: {
-    color: '#777',
+    color: COLORS.muted,
     fontSize: 15,
   },
-  botonCamara: {
-    backgroundColor: '#1565c0',
-    padding: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 10,
+  row: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 4,
   },
-  botonGaleria: {
-    backgroundColor: '#00897b',
-    padding: 14,
-    borderRadius: 12,
+  boton: {
+    paddingVertical: 13,
+    paddingHorizontal: 14,
+    borderRadius: 14,
     alignItems: 'center',
-    marginBottom: 15,
+    justifyContent: 'center',
+  },
+  botonPrimario: {
+    flex: 1,
+    backgroundColor: COLORS.brand,
+    shadowColor: COLORS.brandDark,
+    shadowOpacity: 0.18,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 2,
+  },
+  botonSecundario: {
+    width: 110,
+    backgroundColor: '#EAF6EE',
+    borderWidth: 1,
+    borderColor: '#CFE9D7',
   },
   botonGuardar: {
-    backgroundColor: '#2e7d32',
-    padding: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 15,
+    backgroundColor: COLORS.brandDark,
+    marginTop: 16,
   },
   botonLimpiar: {
-    backgroundColor: '#757575',
-    padding: 14,
-    borderRadius: 12,
-    alignItems: 'center',
+    backgroundColor: '#F2F5F3',
+    borderWidth: 1,
+    borderColor: COLORS.border,
     marginTop: 10,
   },
   textoBoton: {
@@ -324,23 +399,35 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  textoBotonSecundario: {
+    color: COLORS.brandDark,
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  textoBotonLimpiar: {
+    color: COLORS.muted,
+    fontSize: 15,
+    fontWeight: '800',
+  },
   input: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F7FAF8',
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 12,
+    borderColor: COLORS.border,
+    borderRadius: 14,
     padding: 12,
     fontSize: 15,
+    color: COLORS.text,
   },
   inputMultiline: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F7FAF8',
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 12,
+    borderColor: COLORS.border,
+    borderRadius: 14,
     padding: 12,
     minHeight: 90,
     textAlignVertical: 'top',
     fontSize: 15,
+    color: COLORS.text,
   },
   lista: {
     marginTop: 18,
@@ -348,26 +435,40 @@ const styles = StyleSheet.create({
   tituloLista: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#123456',
+    color: COLORS.text,
     marginBottom: 10,
   },
+  vacio: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
   textoListaVacia: {
-    color: '#666',
+    color: COLORS.text,
+    fontWeight: '700',
     textAlign: 'center',
-    marginTop: 8,
+  },
+  textoListaVaciaAyuda: {
+    marginTop: 6,
+    color: COLORS.muted,
+    textAlign: 'center',
   },
   item: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
+    backgroundColor: COLORS.surface,
+    borderRadius: 18,
     padding: 12,
     flexDirection: 'row',
     gap: 12,
     marginBottom: 10,
     elevation: 3,
     shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 5,
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
     shadowOffset: { width: 0, height: 2 },
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   itemImagen: {
     width: 76,
@@ -381,17 +482,17 @@ const styles = StyleSheet.create({
   itemNombre: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#222',
+    color: COLORS.text,
   },
   itemPrecio: {
     marginTop: 2,
     fontSize: 15,
-    color: '#2e7d32',
+    color: COLORS.brandDark,
     fontWeight: 'bold',
   },
   itemDescripcion: {
     marginTop: 6,
-    color: '#555',
+    color: COLORS.muted,
     fontSize: 13,
   },
 });
