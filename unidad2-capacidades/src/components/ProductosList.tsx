@@ -1,14 +1,15 @@
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { COLORS } from '../theme';
 import type { Producto } from '../types';
 
 type Props = {
   productos: Producto[];
+  onSeleccionar?: (producto: Producto) => void;
 };
 
-export function ProductosList({ productos }: Props) {
+export function ProductosList({ productos, onSeleccionar }: Props) {
   if (productos.length === 0) {
     return (
       <View style={styles.vacio}>
@@ -21,7 +22,12 @@ export function ProductosList({ productos }: Props) {
   return (
     <View>
       {productos.map((p) => (
-        <View key={p.id} style={styles.item}>
+        <TouchableOpacity
+          key={p.id}
+          style={styles.item}
+          activeOpacity={0.85}
+          onPress={onSeleccionar ? () => onSeleccionar(p) : undefined}
+        >
           <Image source={{ uri: p.fotoUri }} style={styles.itemImagen} />
           <View style={styles.itemInfo}>
             <Text style={styles.itemNombre}>{p.nombre}</Text>
@@ -32,7 +38,7 @@ export function ProductosList({ productos }: Props) {
               </Text>
             )}
           </View>
-        </View>
+        </TouchableOpacity>
       ))}
     </View>
   );

@@ -3,17 +3,20 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { ProductoForm } from './src/components/ProductoForm';
 import { HomeScreen } from './src/screens/HomeScreen';
+import { ProductoDetalleScreen } from './src/screens/ProductoDetalleScreen';
 import { ProductosScreen } from './src/screens/ProductosScreen';
 import { COLORS } from './src/theme';
 import type { Producto } from './src/types';
 
 export default function App() {
   const [productos, setProductos] = useState<Producto[]>([]);
-  const [pantalla, setPantalla] = useState<'home' | 'productos' | 'publicar'>('home');
+  const [pantalla, setPantalla] = useState<'home' | 'productos' | 'publicar' | 'detalle'>('home');
+  const [productoActivo, setProductoActivo] = useState<Producto | null>(null);
 
   const guardarProducto = (producto: Producto) => {
     setProductos((prev) => [producto, ...prev]);
-    setPantalla('productos');
+    setProductoActivo(producto);
+    setPantalla('detalle');
   };
 
   return (
@@ -32,11 +35,22 @@ export default function App() {
             productos={productos}
             onVolver={() => setPantalla('home')}
             onPublicar={() => setPantalla('publicar')}
+            onVerDetalle={(p) => {
+              setProductoActivo(p);
+              setPantalla('detalle');
+            }}
           />
         ) : null}
 
         {pantalla === 'publicar' ? (
           <ProductoForm onGuardar={guardarProducto} onCancelar={() => setPantalla('home')} />
+        ) : null}
+
+        {pantalla === 'detalle' && productoActivo ? (
+          <ProductoDetalleScreen
+            producto={productoActivo}
+            onVolver={() => setPantalla('productos')}
+          />
         ) : null}
       </View>
     </ScrollView>
