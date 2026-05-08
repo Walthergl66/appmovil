@@ -6,10 +6,11 @@ import { HomeScreen } from './src/screens/HomeScreen';
 import { ProductoDetalleScreen } from './src/screens/ProductoDetalleScreen';
 import { ProductosScreen } from './src/screens/ProductosScreen';
 import { COLORS } from './src/theme';
-import type { Producto } from './src/types';
+import type { Producto, Resena } from './src/types';
 
 export default function App() {
   const [productos, setProductos] = useState<Producto[]>([]);
+  const [resenasPorProducto, setResenasPorProducto] = useState<Record<string, Resena[]>>({});
   const [pantalla, setPantalla] = useState<'home' | 'productos' | 'publicar' | 'detalle'>('home');
   const [productoActivo, setProductoActivo] = useState<Producto | null>(null);
 
@@ -17,6 +18,20 @@ export default function App() {
     setProductos((prev) => [producto, ...prev]);
     setProductoActivo(producto);
     setPantalla('detalle');
+  };
+
+  const guardarResena = (productoId: string, resena: Resena) => {
+    setResenasPorProducto((prev) => ({
+      ...prev,
+      [productoId]: [resena, ...(prev[productoId] ?? [])],
+    }));
+  };
+
+  const eliminarResena = (productoId: string, resenaId: string) => {
+    setResenasPorProducto((prev) => ({
+      ...prev,
+      [productoId]: (prev[productoId] ?? []).filter((r) => r.id !== resenaId),
+    }));
   };
 
   return (
@@ -49,7 +64,10 @@ export default function App() {
         {pantalla === 'detalle' && productoActivo ? (
           <ProductoDetalleScreen
             producto={productoActivo}
+            resenas={resenasPorProducto[productoActivo.id] ?? []}
             onVolver={() => setPantalla('productos')}
+            onGuardarResena={(resena) => guardarResena(productoActivo.id, resena)}
+            onEliminarResena={(resenaId) => eliminarResena(productoActivo.id, resenaId)}
           />
         ) : null}
       </View>

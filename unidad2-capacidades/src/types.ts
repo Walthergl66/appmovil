@@ -7,3 +7,9 @@ export type Producto = {
   creadoEn: number;
 };
 
+export type Resena = {
+  id: string;
+  descripcion: string;
+  evidenciaUri: string;
+  creadoEn: number;
+};

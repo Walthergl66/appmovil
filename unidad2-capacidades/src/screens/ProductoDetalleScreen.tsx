@@ -2,14 +2,24 @@ import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { COLORS } from '../theme';
-import type { Producto } from '../types';
+import type { Producto, Resena } from '../types';
+import { ResenasProducto } from '../components/ReseñasProducto';
 
 type Props = {
   producto: Producto;
+  resenas: Resena[];
   onVolver: () => void;
+  onGuardarResena: (resena: Resena) => void;
+  onEliminarResena: (id: string) => void;
 };
 
-export function ProductoDetalleScreen({ producto, onVolver }: Props) {
+export function ProductoDetalleScreen({
+  producto,
+  resenas,
+  onVolver,
+  onGuardarResena,
+  onEliminarResena,
+}: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
@@ -37,6 +47,12 @@ export function ProductoDetalleScreen({ producto, onVolver }: Props) {
           {producto.descripcion?.trim() ? producto.descripcion : 'Sin descripción'}
         </Text>
       </View>
+
+      <ResenasProducto
+        resenas={resenas}
+        onGuardar={onGuardarResena}
+        onEliminar={onEliminarResena}
+      />
     </View>
   );
 }
@@ -134,4 +150,3 @@ const styles = StyleSheet.create({
     color: COLORS.text,
   },
 });
-
