@@ -193,7 +193,7 @@ export function ResenasProducto({ resenas, onGuardar, onEliminar }: Props) {
             onPress={() => setMostrarAdjuntos((actual) => !actual)}
           >
             <Text style={[styles.textoAdjuntar, mostrarAdjuntos ? styles.textoAdjuntarActivo : null]}>
-              Clip
+              📎
             </Text>
           </TouchableOpacity>
         </View>
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
   },
   textoAdjuntar: {
     color: COLORS.brandDark,
-    fontSize: 13,
+    fontSize: 20,
     fontWeight: '900',
   },
   textoAdjuntarActivo: {
